@@ -203,6 +203,9 @@ function WorkCard({
             </p>
           )}
           <h3 className="mt-1.5 font-display text-[1.7rem] leading-tight text-mart-ink sm:text-3xl">{work.title}</h3>
+          {work.summary && (
+            <p className="mt-2 break-keep font-sans text-[15px] leading-relaxed text-mart-ink/80">{work.summary}</p>
+          )}
           {work.info && work.info.length > 0 && (
             <ul className="mt-2.5 flex flex-wrap gap-2">
               {work.info.map((item) => (

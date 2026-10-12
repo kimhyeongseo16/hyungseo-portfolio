@@ -3,6 +3,33 @@
 import { useEffect, useState } from "react"
 import type { ProcessGroup, Work } from "@/lib/portfolio"
 
+// 상세 화면의 케이스 스터디 — PROJECT OVERVIEW / GOAL / MY ROLE ...
+function ProjectDetails({ work, withTools = false }: { work: Work; withTools?: boolean }) {
+  if (!work.details || work.details.length === 0) return null
+  return (
+    <dl className="space-y-5">
+      {work.details.map((item, i) => (
+        <div key={item.label} className={i > 0 ? "border-t border-dashed border-mart-blue/30 pt-5" : ""}>
+          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">{item.label}</dt>
+          <dd
+            className={`mt-2 whitespace-pre-line break-keep font-sans leading-[1.8] text-mart-ink/85 ${
+              i === 0 ? "text-base sm:text-[17px]" : "text-[15px]"
+            }`}
+          >
+            {item.text}
+          </dd>
+        </div>
+      ))}
+      {withTools && work.tools && work.tools.length > 0 && (
+        <div className="border-t border-dashed border-mart-blue/30 pt-5">
+          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">TOOLS</dt>
+          <dd className="mt-2 font-sans text-[15px] leading-[1.8] text-mart-ink/85">{work.tools.join(" · ")}</dd>
+        </div>
+      )}
+    </dl>
+  )
+}
+
 // 상세 링크가 없는 작품은 사이트 안에서 원본 이미지를 크게 봅니다.
 export function hasProjectLink(work: Work): boolean {
   return Boolean(work.link && work.link !== "#")
@@ -63,6 +90,20 @@ function FocusViewer({ work, onClose }: { work: Work; onClose: () => void }) {
         </p>
         <CloseButton onClose={onClose} dark />
       </div>
+
+      {work.details && work.details.length > 0 && (
+        <div className="flex justify-center px-3 pb-6 sm:px-6">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[min(94vw,900px)] rounded-3xl bg-mart-cream-soft px-6 py-6 sm:px-8 sm:py-7"
+          >
+            {work.tag && (
+              <p className="mb-5 font-display text-sm tracking-widest text-mart-blue-deep">{work.tag}</p>
+            )}
+            <ProjectDetails work={work} withTools />
+          </div>
+        </div>
+      )}
 
       <div className={`flex justify-center px-3 pb-10 sm:px-6 ${page ? "" : "min-h-[calc(100%-4rem)] items-center"}`}>
         {source &&
@@ -200,7 +241,8 @@ export function WorkLightbox({
   const hasLinks = Boolean(
     work.originalUrl || work.siteUrl || work.prototypeUrl || hasProjectLink(work)
   )
-  const hasSide = hasTools || hasLinks
+  const hasDetails = Boolean(work.details && work.details.length > 0)
+  const hasSide = hasTools || hasLinks || hasDetails
   const groups = work.processGroups ?? []
 
   return (
@@ -316,6 +358,8 @@ export function WorkLightbox({
                     )}
                   </div>
                 )}
+
+                <ProjectDetails work={work} />
 
                 {hasTools && (
                   <div className="flex flex-wrap items-center gap-2 border-t border-dashed border-mart-blue/40 pt-5">
