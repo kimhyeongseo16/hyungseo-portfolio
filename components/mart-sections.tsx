@@ -528,7 +528,7 @@ function GridCorner({ category, onOpen }: { category: Category; onOpen: (w: Work
           ))}
         </div>
 
-        <GuideCharacter className="mt-[7vh]" />
+        <GuideCharacter className="mt-[7vh] max-sm:hidden" />
       </div>
     </section>
   )
@@ -605,7 +605,7 @@ function ConveyorBelt() {
   const lane = [...items, ...items]
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[45%] h-[29%] overflow-hidden">
+    <div className="pointer-events-none absolute inset-x-0 top-[45%] h-[29%] overflow-hidden max-sm:inset-x-[30%]">
       <div
         className="flex h-full w-max items-center gap-[2vw] will-change-transform"
         style={{ animation: `belt-flow ${Math.max(14, items.length * 5)}s linear infinite` }}
