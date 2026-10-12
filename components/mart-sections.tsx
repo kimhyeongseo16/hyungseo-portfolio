@@ -246,7 +246,7 @@ function FeaturedCard({
 }) {
   return (
     <article
-      className="relative grid h-full gap-6 rounded-[24px] border border-mart-blue-deep/20 bg-mart-cream-soft/95 p-4 shadow-[0_22px_40px_-28px_rgba(74,107,134,0.9)] sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] sm:items-start sm:gap-8 sm:p-5"
+      className="relative h-full rounded-[24px] border border-mart-blue-deep/20 bg-mart-cream-soft/95 p-4 shadow-[0_22px_40px_-28px_rgba(74,107,134,0.9)] sm:p-5"
       style={{
         transform: shown ? undefined : "translateY(18px)",
         opacity: shown ? 1 : 0,
@@ -259,6 +259,7 @@ function FeaturedCard({
         FEATURED
       </span>
 
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] sm:items-start sm:gap-8">
       {/* 대표 이미지 — 높이는 원본 비율이 정하고, 위부터 아래까지 전체를 보여줍니다. */}
       <div className="relative overflow-hidden rounded-[18px] bg-white">
         {work.image && (
@@ -330,6 +331,20 @@ function FeaturedCard({
           </div>
         )}
       </div>
+      </div>
+
+      {work.details && work.details.length > 0 && (
+        <dl className="mt-6 grid gap-x-10 gap-y-6 border-t border-dashed border-mart-blue/40 px-1 pb-2 pt-6 sm:mt-8 sm:grid-cols-2">
+          {work.details.map((item) => (
+            <div key={item.label}>
+              <dt className="font-display text-sm tracking-widest text-mart-blue-deep">{item.label}</dt>
+              <dd className="mt-3 whitespace-pre-line break-keep font-sans text-[15px] leading-[1.8] text-mart-ink/85">
+                {item.text}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </article>
   )
 }
@@ -571,12 +586,12 @@ function CornerZone({ category }: { category: Category }) {
 function Passage() {
   const { ref, p } = useSectionProgress<HTMLElement>()
   return (
-    <section ref={ref} aria-hidden="true" className="relative h-[250vh] w-full bg-mart-cream max-sm:h-auto">
-      <div className="sticky top-0 h-screen w-full overflow-hidden max-sm:static max-sm:h-[56vh]">
+    <section ref={ref} aria-hidden="true" className="relative h-[250vh] w-full bg-mart-cream max-sm:h-[190vh]">
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
         <img src="/mart/vertical-passage.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
         {/* 캐릭터는 크기를 바꾸지 않고 통로를 따라 천천히 아래로 걸어갑니다. */}
         <div
-          className="pointer-events-none absolute left-1/2 top-0 w-[min(30vw,210px)] will-change-transform max-sm:top-1/2 max-sm:![transform:translate(-50%,-50%)] max-sm:!opacity-100"
+          className="pointer-events-none absolute left-1/2 top-0 w-[min(30vw,210px)] will-change-transform"
           style={{
             transform: `translate(-50%, ${4 + p * 66}vh)`,
             opacity: clamp(p * 14, 0, 1) * clamp((1 - p) * 14, 0, 1),
