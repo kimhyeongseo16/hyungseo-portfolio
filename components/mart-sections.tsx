@@ -165,12 +165,14 @@ function WorkCard({
       {/* 대표 이미지 — 프레임 높이는 통일하되 원본 비율 그대로 담습니다. */}
       <div
         className={`relative flex ${
-          imageOnly ? "aspect-square w-full" : "h-[clamp(190px,24vw,280px)]"
+          imageOnly || work.video ? `${work.video ? "aspect-video" : "aspect-square"} w-full` : "h-[clamp(190px,24vw,280px)]"
         } items-center justify-center overflow-hidden rounded-[18px] ${
-          transparent ? "bg-white/70" : "bg-white"
+          work.video ? "bg-mart-ink" : transparent ? "bg-white/70" : "bg-white"
         }`}
       >
-        {work.image ? (
+        {work.video ? (
+          <VideoCover work={work} video={work.video} load={shown} />
+        ) : work.image ? (
           <img
             src={work.image}
             alt={work.alt ?? work.title}
@@ -225,12 +227,46 @@ function WorkCard({
 
           <p className="mt-4 font-display text-base text-mart-blue-deep">
             <span className="underline-offset-4 group-hover:underline">
-              {work.view === "page" ? "클릭하면 전체 페이지 보기" : "클릭하면 상세 보기"} · 장바구니에 담김
+              {work.video ? "클릭하면 영상 보기" : work.view === "page" ? "클릭하면 전체 페이지 보기" : "클릭하면 상세 보기"} · 장바구니에 담김
             </span>
           </p>
         </div>
       )}
     </article>
+  )
+}
+
+// 영상 작업의 대표 장면 — 재생하지 않고 한 장면만 멈춰 보여주며, 코너가 보일 때 불러옵니다.
+function VideoCover({ work, video, load }: { work: Work; video: string; load: boolean }) {
+  return (
+    <>
+      <video
+        src={load ? `${encodeURI(video)}#t=${work.videoCover ?? 1}` : undefined}
+        preload="metadata"
+        muted
+        playsInline
+        tabIndex={-1}
+        aria-hidden="true"
+        className="pointer-events-none h-full w-full object-contain transition-[filter,transform] duration-200 group-hover:scale-[1.02] group-hover:blur-[2px]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-4 pb-3.5 pt-12 text-white"
+      >
+        <span className="block font-display text-2xl leading-tight tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-[1.7rem]">
+          {work.title}
+        </span>
+        {work.tagline && (
+          <span className="mt-0.5 block font-display text-sm tracking-[0.2em] text-white/85">{work.tagline}</span>
+        )}
+      </span>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-mart-cream-soft/90 pl-0.5 text-base text-mart-ink shadow-[0_8px_18px_-10px_rgba(0,0,0,0.8)]"
+      >
+        ▶
+      </span>
+    </>
   )
 }
 
@@ -412,18 +448,24 @@ function CornerIntro({ intro }: { intro: CategoryIntro }) {
   return (
     <aside className="flex w-[min(78vw,340px)] shrink-0 flex-col justify-center gap-5 self-stretch rounded-[18px] bg-mart-cream-soft/95 px-6 py-6 shadow-[0_16px_28px_-20px_rgba(74,107,134,0.9)] max-sm:w-full">
       <p className="break-keep font-sans text-[15px] leading-[1.8] text-mart-ink/85">{intro.text}</p>
-      <dl className="space-y-4 border-t border-dashed border-mart-blue/30 pt-5">
-        <div>
-          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">PROCESS</dt>
-          <dd className="mt-1 break-keep font-sans text-[15px] leading-[1.7] text-mart-ink/85">
-            {intro.process.join(" → ")}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">TOOLS</dt>
-          <dd className="mt-1 font-sans text-[15px] leading-[1.7] text-mart-ink/85">{intro.tools.join(" · ")}</dd>
-        </div>
-      </dl>
+      {(intro.process || intro.tools) && (
+        <dl className="space-y-4 border-t border-dashed border-mart-blue/30 pt-5">
+          {intro.process && (
+            <div>
+              <dt className="font-display text-sm tracking-widest text-mart-blue-deep">PROCESS</dt>
+              <dd className="mt-1 break-keep font-sans text-[15px] leading-[1.7] text-mart-ink/85">
+                {intro.process.join(" → ")}
+              </dd>
+            </div>
+          )}
+          {intro.tools && (
+            <div>
+              <dt className="font-display text-sm tracking-widest text-mart-blue-deep">TOOLS</dt>
+              <dd className="mt-1 font-sans text-[15px] leading-[1.7] text-mart-ink/85">{intro.tools.join(" · ")}</dd>
+            </div>
+          )}
+        </dl>
+      )}
     </aside>
   )
 }

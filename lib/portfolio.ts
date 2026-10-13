@@ -62,6 +62,12 @@ export type Work = {
   kind?: ZoneKind
   // 진열대 카드에 과정 썸네일을 붙이지 않고, 상세 화면의 과정을 가운데 정렬합니다.
   processCentered?: boolean
+  // 영상 작업 — public/ 아래 영상 경로. 상세 화면에서 재생합니다.
+  video?: string
+  // 진열대 카드에 대표 장면으로 보여줄 영상 위치(초)
+  videoCover?: number
+  // 대표 장면 위에 작품 이름과 함께 얹는 짧은 대표 문구
+  tagline?: string
 }
 
 // CODING 코너 안에서 작업의 성격을 구분합니다.
@@ -112,8 +118,8 @@ export type Category = {
 
 export type CategoryIntro = {
   text: string
-  process: string[]
-  tools: string[]
+  process?: string[]
+  tools?: string[]
 }
 
 export const CODING_PROJECTS: CodingProject[] = [
@@ -526,7 +532,86 @@ export const LOGO_WORKS: Work[] = [
 ]
 
 // 영상 · 모션 작업 — 작품을 추가하면 VIDEO 코너가 GRAPHIC 다음에 자동으로 나타납니다.
-export const VIDEO_WORKS: Work[] = []
+export const VIDEO_WORKS: Work[] = [
+  {
+    id: "video-magic-show",
+    title: "THE MAGIC SHOW",
+    tag: "MOTION GRAPHICS · PROMOTIONAL VIDEO",
+    tagline: "7 MAGIC, 7 MOMENTS",
+    video: "/videos/THE MAGIC SHOW.mp4",
+    videoCover: 18,
+    tools: ["After Effects"],
+    details: [
+      {
+        label: "PROJECT STORY",
+        text: "〈더 매직쇼〉 마지막 우승자 7인의 공연을 소개하는 모션 콘텐츠입니다. 각 마술사가 가진 특징적인 퍼포먼스를 하나씩 영상으로 옮겨, 서로 다른 마술과 각자의 개성이 한 편의 콘텐츠 안에서 보여지도록 구성했습니다.",
+      },
+      {
+        label: "MARKETING POINT",
+        text: "공연에 대한 설명을 길게 전달하기보다 마술 자체의 시각적인 임팩트를 앞세워, 시청자가 짧은 시간 안에 공연의 볼거리를 직관적으로 느끼고 실제 공연에 대한 관심으로 이어질 수 있도록 구성했습니다.",
+      },
+      { label: "MY CONTRIBUTION", text: "영상 기획 · 모션그래픽 제작" },
+    ],
+  },
+  {
+    id: "video-sandwich",
+    title: "SANDWICH PROMOTION",
+    tag: "PRODUCT PROMOTION · MOTION GRAPHICS",
+    tagline: "A NEW BITE",
+    video: "/videos/SANDWICH PROMOTION.mp4",
+    videoCover: 56,
+    tools: ["After Effects"],
+    details: [
+      {
+        label: "PROJECT STORY",
+        text: "샌드위치 가게의 새로운 메뉴를 홍보하기 위해 제작한 제품 프로모션 영상입니다. 제품의 형태와 재료가 가진 특징을 시각적으로 보여주면서, 짧은 영상 안에서도 어떤 메뉴인지 직관적으로 인식할 수 있도록 구성했습니다.",
+      },
+      {
+        label: "MARKETING POINT",
+        text: "제품 정보를 단순하게 설명하기보다 먹음직스러운 제품 이미지와 움직임을 중심으로 시선을 끌고, 짧은 시간 안에 신메뉴에 대한 관심을 유도하는 광고 콘텐츠로 표현했습니다.",
+      },
+      { label: "MY CONTRIBUTION", text: "영상 기획 · 모션그래픽 제작" },
+    ],
+  },
+  {
+    id: "video-chiikawa",
+    title: "CHIIKAWA",
+    tag: "SHORT-FORM CONTENT · TEAM PROJECT",
+    tagline: "A LITTLE STORY",
+    team: true,
+    video: "/videos/chiikawa.mp4",
+    videoCover: 12,
+    tools: ["Premiere Pro"],
+    details: [
+      {
+        label: "PROJECT STORY",
+        text: "꼬꼬무와 같은 짧은 이야기형 콘텐츠의 형식을 참고해, 먼작귀 캐릭터를 소개하는 애니메이션 콘텐츠로 제작했습니다. 짧은 시간 안에 캐릭터의 특징과 상황이 자연스럽게 전달되도록 이야기의 흐름을 구성했습니다.",
+      },
+      {
+        label: "MARKETING POINT",
+        text: "캐릭터를 단순하게 소개하는 방식보다 짧은 쇼츠 형식과 귀여운 캐릭터를 활용해 처음 보는 사람도 자연스럽게 콘텐츠에 관심을 갖고 끝까지 시청할 수 있도록 구성했습니다.",
+      },
+      { label: "MY CONTRIBUTION", text: "콘텐츠 구성 · 영상 편집" },
+    ],
+  },
+  {
+    id: "video-3d-animation",
+    title: "3D ANIMATION",
+    tag: "3D ANIMATION · TEAM PROJECT",
+    tagline: "FROM MODEL TO MOTION",
+    team: true,
+    video: "/videos/3d-animation.mp4",
+    videoCover: 12,
+    tools: ["Maya", "After Effects"],
+    details: [
+      {
+        label: "PROJECT STORY",
+        text: "팀원들과 함께 제작한 3D 애니메이션 프로젝트입니다. 3D 캐릭터와 공간을 제작하고 하나의 영상 콘텐츠로 완성했으며, 제작 과정에서 여러 단계의 작업에 참여해 최종 영상까지 완성했습니다.",
+      },
+      { label: "MY CONTRIBUTION", text: "모델링 · 리깅 · 라이팅 · 렌더링 · After Effects 후반 작업" },
+    ],
+  },
+]
 
 const VIDEO_CATEGORY: Category = {
   no: "06",
@@ -539,6 +624,7 @@ const VIDEO_CATEGORY: Category = {
   flow: "rail",
   background: "/mart/design-corner.png",
   works: VIDEO_WORKS,
+  intro: { text: "움직임으로 이야기를 만들고, 콘텐츠의 매력을 전달한 작업입니다." },
 }
 
 // 마트 동선 — 위에서 아래로 한 코너씩 지나갑니다.

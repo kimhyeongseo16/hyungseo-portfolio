@@ -152,6 +152,98 @@ function FocusViewer({ work, onClose }: { work: Work; onClose: () => void }) {
   )
 }
 
+// 영상 작업 상세 — 영상을 먼저 크게 보여주고, 그 아래에 이야기와 역할을 놓습니다.
+function VideoViewer({
+  work,
+  video,
+  corner,
+  onClose,
+}: {
+  work: Work
+  video: string
+  corner?: string
+  onClose: () => void
+}) {
+  const details = work.details ?? []
+  const stories = details.filter((d) => d.label !== "MY CONTRIBUTION")
+  const contribution = details.find((d) => d.label === "MY CONTRIBUTION")
+  const label = "font-display text-sm tracking-widest text-mart-blue-deep"
+  const body = "mt-2 break-keep font-sans text-[15px] leading-[1.8] text-mart-ink/85"
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${work.title} 영상 보기`}
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-mart-ink/85 px-3 py-4 backdrop-blur-sm sm:px-6 sm:py-8"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[92vh] w-full max-w-[min(94vw,1120px)] flex-col overflow-hidden rounded-3xl bg-mart-cream-soft shadow-[0_40px_80px_-24px_rgba(20,30,40,0.8)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="flex items-start justify-between gap-4 px-6 py-5 sm:px-8">
+          <div className="min-w-0">
+            {corner && <p className="font-display text-sm tracking-[0.3em] text-mart-ink/45">{corner}</p>}
+            <h2 className="mt-1 font-display text-3xl leading-tight text-mart-ink sm:text-4xl">{work.title}</h2>
+            {work.tag && (
+              <p className="mt-1.5 font-display text-base tracking-wide text-mart-blue-deep">{work.tag}</p>
+            )}
+          </div>
+          <CloseButton onClose={onClose} />
+        </header>
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-7 sm:px-8">
+          <div className="overflow-hidden rounded-2xl bg-black">
+            <video
+              src={encodeURI(video)}
+              controls
+              playsInline
+              preload="metadata"
+              className="mx-auto block aspect-video max-h-[64vh] w-full object-contain"
+            />
+          </div>
+
+          <dl className="mt-7 space-y-6">
+            {stories.length > 0 && (
+              <div className={`grid gap-6 ${stories.length > 1 ? "lg:grid-cols-2 lg:gap-10" : ""}`}>
+                {stories.map((item) => (
+                  <div key={item.label}>
+                    <dt className={label}>{item.label}</dt>
+                    <dd className={`${body} sm:text-base`}>{item.text}</dd>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex flex-wrap gap-x-12 gap-y-5 border-t border-dashed border-mart-blue/30 pt-5">
+              {contribution && (
+                <div>
+                  <dt className={label}>MY CONTRIBUTION</dt>
+                  <dd className={body}>{contribution.text}</dd>
+                </div>
+              )}
+              {work.team && (
+                <div>
+                  <dt className="sr-only">TEAM PROJECT</dt>
+                  <dd className="mt-1">
+                    <TeamTag />
+                  </dd>
+                </div>
+              )}
+              {work.tools && work.tools.length > 0 && (
+                <div>
+                  <dt className={label}>TOOLS</dt>
+                  <dd className={body}>{work.tools.join(" · ")}</dd>
+                </div>
+              )}
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // 작품 이미지 뷰어 — 모든 작품이 같은 크기의 보기 영역에 원본 비율 그대로 담깁니다.
 // 아주 긴 이미지는 작게 줄이지 않고 폭에 맞춘 뒤 영역 안에서 세로로 스크롤합니다.
 function ImageFrame({ src, alt }: { src: string; alt: string }) {
@@ -261,6 +353,7 @@ export function WorkLightbox({
     return () => window.removeEventListener("keydown", onKey)
   }, [onClose])
 
+  if (work.video) return <VideoViewer work={work} video={work.video} corner={corner} onClose={onClose} />
   if (work.view) return <FocusViewer work={work} onClose={onClose} />
 
   // 세로로 긴 페이지 원본은 처음부터 페이지 전체를 이어서 보여줍니다.
