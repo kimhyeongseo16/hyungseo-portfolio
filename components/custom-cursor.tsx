@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react"
 type CursorMode = "open" | "grab" | "scan"
 
 // 원본 이미지 크기와 클릭 기준점(hotspot, 원본 px). width는 화면 폭에 따라 줄어드는 CSS 폭입니다.
+// 두 손은 같은 배율(HAND_SCALE)로 그려서, 눌러도 손 크기가 바뀌지 않고 손목 위치도 그대로입니다.
 type CursorImage = {
   src: string
   natural: [w: number, h: number]
@@ -12,9 +13,11 @@ type CursorImage = {
   width: string
 }
 
+const HAND_SCALE = "clamp(0.0263px, 0.005vw, 0.0715px)"
+
 const IMAGES: Record<CursorMode, CursorImage> = {
-  open: { src: "/cursor/hand-palm.png", natural: [1312, 1199], hotspot: [668, 140], width: "clamp(32px, 6.1vw, 88px)" },
-  grab: { src: "/cursor/hand-grab.png", natural: [313, 343], hotspot: [123, 74], width: "clamp(29px, 5.55vw, 80px)" },
+  open: { src: "/cursor/hand-palm.png", natural: [1291, 1218], hotspot: [670, 192], width: `calc(1291 * ${HAND_SCALE})` },
+  grab: { src: "/cursor/hand-grab.png", natural: [1254, 1254], hotspot: [657, 196], width: `calc(1254 * ${HAND_SCALE})` },
   scan: { src: "/cursor/scanner-clear.png", natural: [1536, 1024], hotspot: [395, 366], width: "clamp(43px, 8.2vw, 118px)" },
 }
 
@@ -27,25 +30,36 @@ function inCheckout(): boolean {
   return rect.top <= window.innerHeight * 0.5 && rect.bottom > 0
 }
 
+// 터치에서는 손가락을 대는 동안 움켜진 손, 떼면 펼친 손을 잠깐 보여준 뒤 사라집니다.
+const TOUCH_HIDE_MS = 450
+
 export function CustomCursor() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [enabled, setEnabled] = useState(false)
+  const [finePointer, setFinePointer] = useState(false)
   const [pressed, setPressed] = useState(false)
   const [checkout, setCheckout] = useState(false)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const media = window.matchMedia("(hover: hover) and (pointer: fine)")
-    const sync = () => setEnabled(media.matches)
+    const sync = () => setFinePointer(media.matches)
     sync()
+    setEnabled(true)
     media.addEventListener("change", sync)
     return () => media.removeEventListener("change", sync)
   }, [])
 
   useEffect(() => {
-    if (!enabled) return
+    if (!finePointer) return
     const html = document.documentElement
     html.classList.add("custom-cursor")
+    return () => html.classList.remove("custom-cursor")
+  }, [finePointer])
+
+  useEffect(() => {
+    if (!enabled) return
+    let hideTimer = 0
 
     let raf = 0
     const updateZone = () => setCheckout(inCheckout())
@@ -53,16 +67,28 @@ export function CustomCursor() {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(updateZone)
     }
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return
+    const moveTo = (e: PointerEvent) => {
       const el = rootRef.current
       if (el) el.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+    }
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" && !e.buttons) return
+      moveTo(e)
       setVisible(true)
     }
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType === "mouse") setPressed(true)
+      window.clearTimeout(hideTimer)
+      moveTo(e)
+      setVisible(true)
+      setPressed(true)
     }
-    const onUp = () => setPressed(false)
+    const onUp = (e?: Event) => {
+      setPressed(false)
+      if (e instanceof PointerEvent && e.pointerType !== "mouse") {
+        window.clearTimeout(hideTimer)
+        hideTimer = window.setTimeout(() => setVisible(false), TOUCH_HIDE_MS)
+      }
+    }
     const onLeave = (e: MouseEvent) => {
       if (!e.relatedTarget) setVisible(false)
     }
@@ -71,16 +97,18 @@ export function CustomCursor() {
     window.addEventListener("pointermove", onMove, { passive: true })
     window.addEventListener("pointerdown", onDown)
     window.addEventListener("pointerup", onUp)
+    window.addEventListener("pointercancel", onUp)
     window.addEventListener("blur", onUp)
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onScroll)
     document.addEventListener("mouseout", onLeave)
     return () => {
       cancelAnimationFrame(raf)
-      html.classList.remove("custom-cursor")
+      window.clearTimeout(hideTimer)
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerdown", onDown)
       window.removeEventListener("pointerup", onUp)
+      window.removeEventListener("pointercancel", onUp)
       window.removeEventListener("blur", onUp)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onScroll)
