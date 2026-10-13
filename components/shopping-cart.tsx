@@ -92,7 +92,7 @@ export function CartDock() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={`장바구니 ${items.length}개 담김`}
-        className="pointer-events-auto flex items-center gap-2 rounded-full border border-mart-blue-deep/30 bg-mart-cream-soft/95 py-2 pl-2.5 pr-4 shadow-[0_14px_26px_-16px_rgba(74,107,134,0.8)] backdrop-blur-sm transition-transform duration-300"
+        className="pointer-events-auto flex items-center gap-2 rounded-full border border-mart-blue-deep/30 bg-mart-cream-soft/95 py-2 pl-2.5 pr-4 shadow-[0_14px_26px_-16px_rgba(74,107,134,0.8)] backdrop-blur-sm transition-transform max-sm:backdrop-blur-none duration-300"
         style={{ transform: lastAdded ? "scale(1.07)" : "scale(1)" }}
       >
         {/* 기존 캐릭터 일러스트를 그대로 축소해 아이콘으로 씁니다 */}

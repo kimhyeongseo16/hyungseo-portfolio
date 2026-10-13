@@ -7,6 +7,7 @@ import { CATEGORIES, type Category, type CategoryIntro, type Tone, type Work, ty
 import { showTeamTag, TeamTag, WorkLightbox } from "@/components/work-lightbox"
 import { useCart } from "@/components/shopping-cart"
 import { ReceiptPrintStage } from "@/components/checkout-receipt"
+import { stageHeight } from "@/lib/stage-height"
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, v))
@@ -37,31 +38,57 @@ function useReveal<T extends HTMLElement>() {
 }
 
 // 섹션을 지나가는 정도(0 → 1). 통로의 캐릭터 이동과 코너의 가로 흐름에 씁니다.
-function useSectionProgress<T extends HTMLElement>() {
+// 화면 근처에 있을 때만 계산하고, 높이는 크기가 바뀔 때만 다시 잽니다.
+// media를 주면 그 조건(예: 데스크톱)에서만 계산합니다.
+function useSectionProgress<T extends HTMLElement>(media?: string) {
   const ref = useRef<T>(null)
   const [p, setP] = useState(0)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (media && !window.matchMedia(media).matches) return
     let raf = 0
+    let total = 0
+    const measure = () => {
+      total = el.offsetHeight - stageHeight()
+    }
     const update = () => {
-      const el = ref.current
-      if (!el) return
-      const total = el.offsetHeight - window.innerHeight
       setP(total > 0 ? clamp(-el.getBoundingClientRect().top / total, 0, 1) : 0)
     }
     const onScroll = () => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(update)
     }
+    const onResize = () => {
+      measure()
+      onScroll()
+    }
+    measure()
     update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          window.addEventListener("scroll", onScroll, { passive: true })
+        } else {
+          window.removeEventListener("scroll", onScroll)
+        }
+        onScroll()
+      },
+      { rootMargin: "50% 0px" }
+    )
+    io.observe(el)
+    const ro = new ResizeObserver(onResize)
+    ro.observe(el)
+    window.addEventListener("resize", onResize)
     return () => {
       cancelAnimationFrame(raf)
+      io.disconnect()
+      ro.disconnect()
       window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
+      window.removeEventListener("resize", onResize)
     }
-  }, [])
+  }, [media])
 
   return { ref, p }
 }
@@ -491,7 +518,7 @@ function GuideCharacter({ className = "", size = "w-[min(30vw,170px)]" }: { clas
 function CornerBackdrop({ src }: { src: string }) {
   return (
     <>
-      <img src={src} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+      <img src={src} alt="" aria-hidden="true" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
       <div aria-hidden="true" className="absolute inset-0 bg-mart-cream/78" />
     </>
   )
@@ -531,7 +558,8 @@ function renderCards({ category, shown, onOpen }: CardsProps) {
 
 // 가로로 흐르는 코너 — 세로로 스크롤하면 진열대가 옆으로 지나갑니다. (모바일은 세로로 쌓입니다)
 function RailCorner({ category, onOpen }: { category: Category; onOpen: (w: Work) => void }) {
-  const { ref, p } = useSectionProgress<HTMLElement>()
+  // 모바일은 진열대가 세로로 쌓여 진행도를 쓰지 않습니다.
+  const { ref, p } = useSectionProgress<HTMLElement>("(min-width: 640px)")
   const railRef = useRef<HTMLDivElement>(null)
   const { ref: revealRef, shown } = useReveal<HTMLDivElement>()
   const { ref: featuredRef, shown: featuredShown } = useReveal<HTMLDivElement>()
@@ -689,7 +717,7 @@ function Passage() {
   return (
     <section ref={ref} aria-hidden="true" className="relative h-[250vh] w-full bg-mart-cream max-sm:h-[190vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <img src="/mart/vertical-passage.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="/mart/vertical-passage.png" alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
         {/* 캐릭터는 크기를 바꾸지 않고 통로를 따라 천천히 아래로 걸어갑니다. */}
         <div
           className="pointer-events-none absolute left-1/2 top-0 w-[min(30vw,210px)] will-change-transform"

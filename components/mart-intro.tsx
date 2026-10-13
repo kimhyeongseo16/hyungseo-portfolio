@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ShoppingChecklist } from "./shopping-checklist"
 import { MartSections } from "./mart-sections"
 import { MartNav } from "./mart-nav"
 import { CartDock, CartProvider, type CartItem } from "./shopping-cart"
 import { CATEGORIES } from "@/lib/portfolio"
+import { stageHeight } from "@/lib/stage-height"
 
 // easing for a smooth "walking toward the door" feel
 function easeInOutCubic(x: number): number {
@@ -31,6 +32,10 @@ export function MartIntro() {
   const [leaving, setLeaving] = useState(false)
   const [introOnScreen, setIntroOnScreen] = useState(true)
   const reachedEndRef = useRef(false)
+  // 인트로 진행도가 바뀔 때 매장 전체가 다시 그려지지 않도록 한 번만 만듭니다.
+  const store = useMemo(() => <MartSections />, [])
+  const dock = useMemo(() => <CartDock />, [])
+  const nav = useMemo(() => <MartNav />, [])
 
   // when the shopper "steps in", glide the page down into the aisle scene
   const handleStart = () => {
@@ -50,7 +55,7 @@ export function MartIntro() {
     const update = () => {
       const el = scrollRef.current
       if (!el) return
-      const total = el.offsetHeight - window.innerHeight
+      const total = el.offsetHeight - stageHeight()
       const p = total > 0 ? clamp(-el.getBoundingClientRect().top / total, 0, 1) : 0
       setProgress(p)
       setIntroOnScreen(el.getBoundingClientRect().bottom > window.innerHeight * 0.5)
@@ -104,16 +109,16 @@ export function MartIntro() {
 
       {started && (
         <>
-          <MartSections />
+          {store}
           {/* 매장에 들어온 뒤에만 장바구니와 코너 안내가 따라다닙니다. */}
-          <CartDock />
+          {dock}
           {/* 코너 안내는 인트로를 벗어난 뒤에만 보입니다. */}
           <div
             aria-hidden={introOnScreen}
             className="transition-opacity duration-300"
             style={{ opacity: introOnScreen ? 0 : 1, visibility: introOnScreen ? "hidden" : "visible" }}
           >
-            <MartNav />
+            {nav}
           </div>
         </>
       )}

@@ -276,6 +276,15 @@
   }
 }
 
+/* 모바일 가로 코너 안내 — 스크롤바 없이 손가락으로 옆으로 밉니다. */
+.mart-nav-scroll {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.mart-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 html.custom-cursor,
 html.custom-cursor * {
   cursor: none !important;

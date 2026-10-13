@@ -13,7 +13,7 @@ type CursorImage = {
   width: string
 }
 
-const HAND_SCALE = "clamp(0.0263px, 0.005vw, 0.0715px)"
+const HAND_SCALE = "clamp(0.0197px, 0.00375vw, 0.0536px)"
 
 const IMAGES: Record<CursorMode, CursorImage> = {
   open: { src: "/cursor/hand-palm.png", natural: [1291, 1218], hotspot: [670, 192], width: `calc(1291 * ${HAND_SCALE})` },
@@ -30,12 +30,8 @@ function inCheckout(): boolean {
   return rect.top <= window.innerHeight * 0.5 && rect.bottom > 0
 }
 
-// 터치에서는 손가락을 대는 동안 움켜진 손, 떼면 펼친 손을 잠깐 보여준 뒤 사라집니다.
-const TOUCH_HIDE_MS = 450
-
 export function CustomCursor() {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [enabled, setEnabled] = useState(false)
   const [finePointer, setFinePointer] = useState(false)
   const [pressed, setPressed] = useState(false)
   const [checkout, setCheckout] = useState(false)
@@ -45,7 +41,6 @@ export function CustomCursor() {
     const media = window.matchMedia("(hover: hover) and (pointer: fine)")
     const sync = () => setFinePointer(media.matches)
     sync()
-    setEnabled(true)
     media.addEventListener("change", sync)
     return () => media.removeEventListener("change", sync)
   }, [])
@@ -57,9 +52,9 @@ export function CustomCursor() {
     return () => html.classList.remove("custom-cursor")
   }, [finePointer])
 
+  // 마우스처럼 정밀한 포인터에서만 손 커서를 씁니다. 터치 기기는 기본 터치 동작 그대로입니다.
   useEffect(() => {
-    if (!enabled) return
-    let hideTimer = 0
+    if (!finePointer) return
 
     let raf = 0
     const updateZone = () => setCheckout(inCheckout())
@@ -72,23 +67,17 @@ export function CustomCursor() {
       if (el) el.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
     }
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" && !e.buttons) return
+      if (e.pointerType !== "mouse") return
       moveTo(e)
       setVisible(true)
     }
     const onDown = (e: PointerEvent) => {
-      window.clearTimeout(hideTimer)
+      if (e.pointerType !== "mouse") return
       moveTo(e)
       setVisible(true)
       setPressed(true)
     }
-    const onUp = (e?: Event) => {
-      setPressed(false)
-      if (e instanceof PointerEvent && e.pointerType !== "mouse") {
-        window.clearTimeout(hideTimer)
-        hideTimer = window.setTimeout(() => setVisible(false), TOUCH_HIDE_MS)
-      }
-    }
+    const onUp = () => setPressed(false)
     const onLeave = (e: MouseEvent) => {
       if (!e.relatedTarget) setVisible(false)
     }
@@ -104,7 +93,6 @@ export function CustomCursor() {
     document.addEventListener("mouseout", onLeave)
     return () => {
       cancelAnimationFrame(raf)
-      window.clearTimeout(hideTimer)
       window.removeEventListener("pointermove", onMove)
       window.removeEventListener("pointerdown", onDown)
       window.removeEventListener("pointerup", onUp)
@@ -114,9 +102,9 @@ export function CustomCursor() {
       window.removeEventListener("resize", onScroll)
       document.removeEventListener("mouseout", onLeave)
     }
-  }, [enabled])
+  }, [finePointer])
 
-  if (!enabled) return null
+  if (!finePointer) return null
 
   const mode: CursorMode = checkout ? "scan" : pressed ? "grab" : "open"
 
