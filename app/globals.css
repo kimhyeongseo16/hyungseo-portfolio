@@ -284,8 +284,3 @@
 .mart-nav-scroll::-webkit-scrollbar {
   display: none;
 }
-
-html.custom-cursor,
-html.custom-cursor * {
-  cursor: none !important;
-}
