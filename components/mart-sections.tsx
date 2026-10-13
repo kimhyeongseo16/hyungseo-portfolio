@@ -4,7 +4,7 @@
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react"
 import { CATEGORIES, type Category, type Tone, type Work, type ZoneKind } from "@/lib/portfolio"
-import { TeamTag, WorkLightbox } from "@/components/work-lightbox"
+import { showTeamTag, TeamTag, WorkLightbox } from "@/components/work-lightbox"
 import { useCart } from "@/components/shopping-cart"
 import { ReceiptPrintStage } from "@/components/checkout-receipt"
 
@@ -199,7 +199,7 @@ function WorkCard({
           {(work.tag || work.team) && (
             <p className="flex flex-wrap items-center gap-2 font-display text-sm tracking-widest text-mart-blue-deep">
               {work.tag}
-              {work.team && <TeamTag />}
+              {showTeamTag(work) && <TeamTag />}
             </p>
           )}
           <h3 className="mt-1.5 font-display text-[1.7rem] leading-tight text-mart-ink sm:text-3xl">{work.title}</h3>
@@ -219,6 +219,8 @@ function WorkCard({
             </ul>
           )}
 
+          <ContributionBar work={work} className="mt-3" />
+
           <ProcessStrip work={work} />
 
           <p className="mt-4 font-display text-base text-mart-blue-deep">
@@ -229,6 +231,28 @@ function WorkCard({
         </div>
       )}
     </article>
+  )
+}
+
+function ContributionBar({ work, className = "" }: { work: Work; className?: string }) {
+  if (work.contribution === undefined) return null
+  return (
+    <div className={`max-w-[260px] ${className}`}>
+      <p className="flex items-baseline justify-between font-display text-sm tracking-widest text-mart-blue-deep">
+        <span>MY CONTRIBUTION</span>
+        <span className="text-mart-ink">{work.contribution}%</span>
+      </p>
+      <div
+        role="progressbar"
+        aria-label="기여도"
+        aria-valuenow={work.contribution}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        className="mt-2 h-2 w-full overflow-hidden rounded-full bg-mart-blue/20"
+      >
+        <div className="h-full rounded-full bg-mart-blue-deep" style={{ width: `${work.contribution}%` }} />
+      </div>
+    </div>
   )
 }
 
@@ -282,7 +306,7 @@ function FeaturedCard({
           {(work.tag || work.team) && (
             <p className="flex flex-wrap items-center gap-2 font-display text-sm tracking-widest text-mart-blue-deep">
               {work.tag}
-              {work.team && !work.info?.includes("TEAM PROJECT") && <TeamTag />}
+              {showTeamTag(work) && <TeamTag />}
             </p>
           )}
           <h3 className="mt-3 font-display text-[2.6rem] leading-[1.05] text-mart-ink lg:text-5xl">
@@ -305,24 +329,7 @@ function FeaturedCard({
           {work.tools && work.tools.length > 0 && (
             <p className="mt-2 font-display text-base tracking-wide text-mart-ink/70">{work.tools.join(" · ")}</p>
           )}
-          {work.contribution !== undefined && (
-            <div className="mt-5 max-w-[260px]">
-              <p className="flex items-baseline justify-between font-display text-sm tracking-widest text-mart-blue-deep">
-                <span>MY CONTRIBUTION</span>
-                <span className="text-mart-ink">{work.contribution}%</span>
-              </p>
-              <div
-                role="progressbar"
-                aria-label="기여도"
-                aria-valuenow={work.contribution}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                className="mt-2 h-2 w-full overflow-hidden rounded-full bg-mart-blue/20"
-              >
-                <div className="h-full rounded-full bg-mart-blue-deep" style={{ width: `${work.contribution}%` }} />
-              </div>
-            </div>
-          )}
+          <ContributionBar work={work} className="mt-5" />
         </div>
 
         {work.overview && (

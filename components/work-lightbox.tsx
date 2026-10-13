@@ -4,7 +4,17 @@ import { useEffect, useState } from "react"
 import type { ProcessGroup, Work } from "@/lib/portfolio"
 
 // 상세 화면의 케이스 스터디 — PROJECT OVERVIEW / GOAL / MY ROLE ...
-function ProjectDetails({ work, withTools = false }: { work: Work; withTools?: boolean }) {
+function ProjectDetails({
+  work,
+  withTools = false,
+  clampFirst = false,
+}: {
+  work: Work
+  withTools?: boolean
+  // 모바일에서 첫 문단을 몇 줄만 먼저 보여주고, 나머지는 펼쳐서 읽습니다.
+  clampFirst?: boolean
+}) {
+  const [expanded, setExpanded] = useState(false)
   if (!work.details || work.details.length === 0) return null
   return (
     <dl className="space-y-5">
@@ -14,10 +24,19 @@ function ProjectDetails({ work, withTools = false }: { work: Work; withTools?: b
           <dd
             className={`mt-2 whitespace-pre-line break-keep font-sans leading-[1.8] text-mart-ink/85 ${
               i === 0 ? "text-base sm:text-[17px]" : "text-[15px]"
-            }`}
+            } ${i === 0 && clampFirst && !expanded ? "max-sm:line-clamp-5" : ""}`}
           >
             {item.text}
           </dd>
+          {i === 0 && clampFirst && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-1 font-display text-sm tracking-wide text-mart-blue-deep underline underline-offset-4 sm:hidden"
+            >
+              {expanded ? "접기 ↑" : "더 읽기 ↓"}
+            </button>
+          )}
         </div>
       ))}
       {withTools && work.tools && work.tools.length > 0 && !work.details.some((d) => d.label === "TOOLS") && (
@@ -41,6 +60,11 @@ const PRIMARY_LINK = `${LINK_BASE} bg-mart-blue-deep text-white`
 const LIGHT_LINK = `${LINK_BASE} border border-mart-blue-deep/40 bg-white text-mart-ink`
 const SECONDARY_LINK =
   "inline-flex min-h-[44px] items-center rounded-full border border-mart-ink/25 bg-white/80 px-5 font-display text-base text-mart-ink/80 transition-colors hover:bg-white"
+
+// 분류나 태그에 TEAM PROJECT가 이미 적혀 있으면 작은 태그를 겹쳐 붙이지 않습니다.
+export function showTeamTag(work: Work): boolean {
+  return Boolean(work.team) && !work.tag?.includes("TEAM PROJECT") && !work.info?.includes("TEAM PROJECT")
+}
 
 export function TeamTag() {
   return (
@@ -91,21 +115,26 @@ function FocusViewer({ work, onClose }: { work: Work; onClose: () => void }) {
         <CloseButton onClose={onClose} dark />
       </div>
 
+      <div className="flex flex-col">
       {work.details && work.details.length > 0 && (
-        <div className="flex justify-center px-3 pb-6 sm:px-6">
+        <div className={`flex justify-center px-3 pb-6 sm:px-6 ${page ? "" : "max-sm:order-2"}`}>
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[min(94vw,900px)] rounded-3xl bg-mart-cream-soft px-6 py-6 sm:px-8 sm:py-7"
+            className="w-full max-w-[min(94vw,900px)] rounded-3xl bg-mart-cream-soft px-5 py-5 sm:px-8 sm:py-7"
           >
             {work.tag && (
-              <p className="mb-5 font-display text-sm tracking-widest text-mart-blue-deep">{work.tag}</p>
+              <p className="mb-4 font-display text-sm tracking-widest text-mart-blue-deep sm:mb-5">{work.tag}</p>
             )}
-            <ProjectDetails work={work} withTools />
+            <ProjectDetails work={work} withTools clampFirst={page} />
           </div>
         </div>
       )}
 
-      <div className={`flex justify-center px-3 pb-10 sm:px-6 ${page ? "" : "min-h-[calc(100%-4rem)] items-center"}`}>
+      <div
+        className={`flex justify-center px-3 pb-10 sm:px-6 ${
+          page ? "" : "min-h-[calc(100%-4rem)] items-center max-sm:order-1 max-sm:min-h-0 max-sm:pb-4"
+        }`}
+      >
         {source &&
           (page ? (
             <img
@@ -117,6 +146,7 @@ function FocusViewer({ work, onClose }: { work: Work; onClose: () => void }) {
           ) : (
             <ImageFrame key={source} src={source} alt={work.alt ?? work.title} />
           ))}
+      </div>
       </div>
     </div>
   )
@@ -130,7 +160,7 @@ function ImageFrame({ src, alt }: { src: string; alt: string }) {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`h-[min(84vh,900px)] w-[min(90vw,900px)] rounded-3xl bg-white/[0.06] p-3 sm:p-5 ${
+      className={`h-[min(84vh,900px)] w-[min(90vw,900px)] rounded-3xl bg-white/[0.06] p-3 max-sm:h-auto sm:p-5 ${
         tall ? "overflow-y-auto overscroll-contain" : ""
       }`}
     >
@@ -138,7 +168,7 @@ function ImageFrame({ src, alt }: { src: string; alt: string }) {
         src={src}
         alt={alt}
         onLoad={(e) => setTall(e.currentTarget.naturalHeight > e.currentTarget.naturalWidth * 1.6)}
-        className={tall ? "block h-auto w-full" : "block h-full w-full object-contain"}
+        className={tall ? "block h-auto w-full" : "block h-full w-full object-contain max-sm:h-auto"}
       />
     </div>
   )
@@ -266,7 +296,7 @@ export function WorkLightbox({
             {(work.tag || work.team) && (
               <p className="mt-1.5 flex flex-wrap items-center gap-2 font-display text-base tracking-wide text-mart-blue-deep">
                 {work.tag}
-                {work.team && <TeamTag />}
+                {showTeamTag(work) && <TeamTag />}
               </p>
             )}
             {work.info && work.info.length > 0 && (
@@ -286,10 +316,14 @@ export function WorkLightbox({
         </header>
 
         {/* 본문 — 큰 이미지도 모달 안에서만 스크롤됩니다. */}
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-7 sm:px-8">
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-7 sm:px-8 ${
+            groups.length > 0 ? "max-sm:flex max-sm:flex-col" : ""
+          }`}
+        >
           {(groups.length === 0 || hasSide) && (
           <div
-            className={`grid gap-8 ${
+            className={`grid gap-8 ${groups.length > 0 ? "max-sm:order-2 max-sm:mt-8" : ""} ${
               hasSide && groups.length === 0
                 ? tallPage
                   ? "lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]"
@@ -380,7 +414,7 @@ export function WorkLightbox({
           )}
 
           {groups.length > 0 && (
-            <div className={hasSide ? "mt-8" : ""}>
+            <div className={`${hasSide ? "mt-8" : ""} max-sm:order-1 max-sm:mt-0`}>
               <ProcessGroups groups={groups} centered={work.processCentered} />
             </div>
           )}
