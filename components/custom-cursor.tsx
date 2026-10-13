@@ -14,7 +14,7 @@ type CursorImage = {
   shift?: [x: number, y: number]
 }
 
-const HAND_SCALE = "clamp(0.0148px, 0.0028vw, 0.0403px)"
+const HAND_SCALE = "clamp(0.02px, 0.00378vw, 0.0544px)"
 
 const IMAGES: Record<CursorMode, CursorImage> = {
   open: { src: "/cursor/hand-palm.png", natural: [1291, 1218], hotspot: [670, 192], width: `calc(1291 * ${HAND_SCALE})` },
@@ -25,8 +25,8 @@ const IMAGES: Record<CursorMode, CursorImage> = {
 const MODES: CursorMode[] = ["open", "grab", "scan"]
 
 // 기본 마우스 커서를 가리지 않도록 손은 커서의 오른쪽 아래에 떨어져서 따라옵니다.
-const OFFSET_X = 22
-const OFFSET_Y = 26
+const OFFSET_X = 30
+const OFFSET_Y = 34
 // 한 프레임(60fps)마다 남은 거리의 몇 %를 따라잡을지. 작을수록 더 늦게 따라옵니다.
 const FOLLOW = 0.2
 
