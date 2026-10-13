@@ -3,6 +3,7 @@
 // 형서마트 진열 — 위에서 아래로 한 코너씩 지나가며, 코너 안에서는 작업물이 가로로 흘러갑니다.
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react"
+import { Check, Heart } from "lucide-react"
 import { CATEGORIES, type Category, type CategoryIntro, type Tone, type Work, type ZoneKind } from "@/lib/portfolio"
 import { showTeamTag, TeamTag, WorkLightbox } from "@/components/work-lightbox"
 import { useCart } from "@/components/shopping-cart"
@@ -471,7 +472,8 @@ function CornerSign({ category }: { category: Category }) {
 }
 
 // 코너 소개 — 진열대 맨 앞에 한 번만 놓이고, 작품 카드로 세지 않습니다.
-function CornerIntro({ intro }: { intro: CategoryIntro }) {
+function CornerIntro({ intro, count }: { intro: CategoryIntro; count: number }) {
+  if (intro.title) return <CornerChecklistIntro intro={intro} count={count} />
   return (
     <aside className="flex w-[min(78vw,340px)] shrink-0 flex-col justify-center gap-5 self-stretch rounded-[18px] bg-mart-cream-soft/95 px-6 py-6 shadow-[0_16px_28px_-20px_rgba(74,107,134,0.9)] max-sm:w-full">
       <p className="break-keep font-sans text-[15px] leading-[1.8] text-mart-ink/85">{intro.text}</p>
@@ -492,6 +494,51 @@ function CornerIntro({ intro }: { intro: CategoryIntro }) {
             </div>
           )}
         </dl>
+      )}
+    </aside>
+  )
+}
+
+// 체크리스트형 코너 소개 — 제목 · 한 줄 소개 · 작업 범위 · 작품 수만 여유 있게 놓습니다.
+function CornerChecklistIntro({ intro, count }: { intro: CategoryIntro; count: number }) {
+  return (
+    <aside className="flex w-[min(78vw,340px)] shrink-0 flex-col justify-center gap-4 self-stretch rounded-[18px] bg-mart-cream-soft/95 px-7 py-5 shadow-[0_16px_28px_-20px_rgba(74,107,134,0.9)] max-sm:w-full">
+      <div>
+        <p className="flex items-center gap-2 font-display text-lg tracking-[0.18em] text-mart-blue-deep">
+          {intro.title}
+          <Heart aria-hidden="true" className="h-3.5 w-3.5 fill-mart-pink text-mart-blue-deep/60" strokeWidth={2.2} />
+        </p>
+        <p className="mt-2 whitespace-pre-line break-keep font-sans text-[15px] leading-[1.75] text-mart-ink/85">{intro.text}</p>
+      </div>
+
+      {intro.list && (
+        <div className="border-t border-dashed border-mart-blue/30 pt-4">
+          {intro.listLabel && (
+            <p className="font-display text-sm tracking-widest text-mart-blue-deep">{intro.listLabel}</p>
+          )}
+          <ul className="mt-2 space-y-1.5">
+            {intro.list.map((item) => (
+              <li key={item} className="flex items-center gap-2.5 font-sans text-[15px] text-mart-ink/85">
+                <span aria-hidden="true" className="h-[15px] w-[15px] flex-none rounded-[4px] border-2 border-mart-blue/60 bg-white/80" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {intro.showCount && (
+        <div className="flex items-center gap-2 border-t border-dashed border-mart-blue/30 pt-4">
+          <Check aria-hidden="true" className="h-4 w-4 text-mart-blue-deep" strokeWidth={3} />
+          <p className="font-display text-base tracking-[0.2em] text-mart-ink">
+            {String(count).padStart(2, "0")} WORKS
+          </p>
+          <span aria-hidden="true" className="ml-auto flex gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-mart-blue/50" />
+            <span className="h-1.5 w-1.5 rounded-full bg-mart-pink" />
+            <span className="h-1.5 w-1.5 rounded-full bg-mart-yellow" />
+          </span>
+        </div>
       )}
     </aside>
   )
@@ -602,7 +649,7 @@ function RailCorner({ category, onOpen }: { category: Category; onOpen: (w: Work
             // 오른쪽 안내 영역(--nav-space)은 비워 두고, 진열대는 그 앞에서 잘립니다.
             className="mt-[5vh] mr-[var(--nav-space)] flex gap-7 overflow-x-auto pb-3 pl-[max(5vw,1.25rem)] pr-6 pt-3 [scrollbar-width:none] max-sm:mr-0 max-sm:flex-col max-sm:items-stretch max-sm:overflow-visible max-sm:px-0 [&::-webkit-scrollbar]:hidden"
           >
-            {category.intro && <CornerIntro intro={category.intro} />}
+            {category.intro && <CornerIntro intro={category.intro} count={category.works.length} />}
             {renderCards({ category: { ...category, works: railWorks }, shown, onOpen }).map((card, i) => (
               <div key={railWorks[i].id} className="w-[min(78vw,420px)] shrink-0 max-sm:w-full">
                 {card}

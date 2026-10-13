@@ -120,6 +120,12 @@ export type CategoryIntro = {
   text: string
   process?: string[]
   tools?: string[]
+  // 소개 카드 맨 위 제목 — 있으면 체크리스트형 소개 카드로 그립니다.
+  title?: string
+  listLabel?: string
+  list?: string[]
+  // 카드 맨 아래에 작품 개수(예: 04 WORKS)를 표시합니다.
+  showCount?: boolean
 }
 
 export const CODING_PROJECTS: CodingProject[] = [
@@ -624,7 +630,13 @@ const VIDEO_CATEGORY: Category = {
   flow: "rail",
   background: "/mart/design-corner.png",
   works: VIDEO_WORKS,
-  intro: { text: "움직임으로 이야기를 만들고, 콘텐츠의 매력을 전달한 작업입니다." },
+  intro: {
+    title: "VIDEO / MOTION",
+    text: "움직임으로 이야기를 만들고,\n콘텐츠의 매력을 전달합니다.",
+    listLabel: "VIDEO CONTENT",
+    list: ["영상 기획", "영상 편집", "모션그래픽", "애니메이션"],
+    showCount: true,
+  },
 }
 
 // 마트 동선 — 위에서 아래로 한 코너씩 지나갑니다.
