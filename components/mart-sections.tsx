@@ -238,11 +238,13 @@ function FeaturedCard({
   tone,
   delay,
   shown,
+  onOpen,
 }: {
   work: Work
   tone: Tone
   delay: number
   shown: boolean
+  onOpen: () => void
 }) {
   return (
     <article
@@ -261,18 +263,26 @@ function FeaturedCard({
 
       <div className="grid gap-6 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] sm:items-start sm:gap-8">
       {/* 대표 이미지 — 높이는 원본 비율이 정하고, 위부터 아래까지 전체를 보여줍니다. */}
-      <div className="relative overflow-hidden rounded-[18px] bg-white">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`${work.title} 이미지 크게 보기`}
+        className="group relative block w-full overflow-hidden rounded-[18px] bg-white text-left"
+      >
         {work.image && (
           <img src={work.image} alt={work.alt ?? work.title} loading="lazy" className="block h-auto w-full" />
         )}
-      </div>
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-mart-ink/70 px-3 py-1 font-display text-xs tracking-widest text-white opacity-0 transition-opacity group-hover:opacity-100 max-sm:opacity-100">
+          크게 보기 ⤢
+        </span>
+      </button>
 
       <div className="flex min-w-0 flex-col justify-between gap-10 px-1 pb-1 max-sm:order-first sm:sticky sm:top-[14vh] sm:min-h-[70vh] sm:py-2">
         <div>
           {(work.tag || work.team) && (
             <p className="flex flex-wrap items-center gap-2 font-display text-sm tracking-widest text-mart-blue-deep">
               {work.tag}
-              {work.team && <TeamTag />}
+              {work.team && !work.info?.includes("TEAM PROJECT") && <TeamTag />}
             </p>
           )}
           <h3 className="mt-3 font-display text-[2.6rem] leading-[1.05] text-mart-ink lg:text-5xl">
@@ -294,6 +304,24 @@ function FeaturedCard({
           )}
           {work.tools && work.tools.length > 0 && (
             <p className="mt-2 font-display text-base tracking-wide text-mart-ink/70">{work.tools.join(" · ")}</p>
+          )}
+          {work.contribution !== undefined && (
+            <div className="mt-5 max-w-[260px]">
+              <p className="flex items-baseline justify-between font-display text-sm tracking-widest text-mart-blue-deep">
+                <span>MY CONTRIBUTION</span>
+                <span className="text-mart-ink">{work.contribution}%</span>
+              </p>
+              <div
+                role="progressbar"
+                aria-label="기여도"
+                aria-valuenow={work.contribution}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                className="mt-2 h-2 w-full overflow-hidden rounded-full bg-mart-blue/20"
+              >
+                <div className="h-full rounded-full bg-mart-blue-deep" style={{ width: `${work.contribution}%` }} />
+              </div>
+            </div>
           )}
         </div>
 
@@ -414,6 +442,7 @@ function renderCards({ category, shown, onOpen }: CardsProps) {
         tone={category.tone}
         delay={i * 90}
         shown={shown}
+        onOpen={() => onOpen(work)}
       />
     ) : (
     <WorkCard
@@ -511,6 +540,7 @@ function RailCorner({ category, onOpen }: { category: Category; onOpen: (w: Work
                 tone={category.tone}
                 delay={i * 90}
                 shown={featuredShown}
+                onOpen={() => onOpen(work)}
               />
             </div>
           ))}

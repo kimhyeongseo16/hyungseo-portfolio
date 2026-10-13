@@ -20,7 +20,7 @@ function ProjectDetails({ work, withTools = false }: { work: Work; withTools?: b
           </dd>
         </div>
       ))}
-      {withTools && work.tools && work.tools.length > 0 && (
+      {withTools && work.tools && work.tools.length > 0 && !work.details.some((d) => d.label === "TOOLS") && (
         <div className="border-t border-dashed border-mart-blue/30 pt-5">
           <dt className="font-display text-sm tracking-widest text-mart-blue-deep">TOOLS</dt>
           <dd className="mt-2 font-sans text-[15px] leading-[1.8] text-mart-ink/85">{work.tools.join(" · ")}</dd>

@@ -53,6 +53,7 @@ export type Work = {
   prototypeUrl?: string // 피그마 프로토타입
   // 클릭했을 때 보여주는 방식 — page: 완성 페이지 전체 / image: 작품 이미지만 크게
   view?: "page" | "image"
+  contribution?: number
   // 세로로 긴 페이지 원본은 진열대 카드에서 위쪽부터 보여줍니다.
   thumbTop?: boolean
   // 코너 안에서 따로, 크게 진열하는 대표 프로젝트
@@ -180,21 +181,23 @@ export const WEB_PROJECTS: Work[] = [
     id: "coding-samdasoo",
     title: "JEJU SAMDASOO",
     tag: "ECO CAMPAIGN · WEB DESIGN",
-    info: ["RESPONSIVE", "CONTRIBUTION 33%"],
-    overview: "제주삼다수의 친환경 캠페인 참여를 유도하기 위한\n참여형 랜딩페이지입니다. 캠페인 소개부터 굿즈,\n참여 방법과 인증까지 사용자의 행동 흐름에 맞춰 구성했습니다.",
+    info: ["TEAM PROJECT", "RESPONSIVE"],
+    overview: "친환경 캠페인의 참여를 유도하는 참여형 랜딩페이지.",
+    contribution: 33,
     tools: ["Figma", "Photoshop", "HTML", "CSS"],
-    summary: "제주삼다수의 친환경 캠페인 참여를 유도하기 위한 참여형 랜딩페이지입니다. 캠페인 소개부터 굿즈, 참여 방법과 인증까지 사용자의 행동 흐름에 맞춰 구성했습니다.",
+    summary: "친환경 캠페인의 참여를 유도하는 참여형 랜딩페이지.",
     details: [
-      { label: "BACKGROUND · GOAL", text: "제주삼다수의 친환경 캠페인을 알리고, 사용자가 실제로 참여하도록 이끄는 참여형 랜딩페이지입니다. 친환경이라는 메시지는 공감을 얻기는 쉽지만 ‘그래서 내가 무엇을 하면 되는지’는 잘 떠오르지 않는다는 점에서 출발했습니다. 그래서 친환경 가치를 소개하는 데서 그치지 않고, 추상적인 메시지를 사용자가 직접 행동할 수 있는 캠페인으로 구체화하는 것을 목표로 했습니다." },
-      { label: "CAMPAIGN FLOW", text: "페이지는 캠페인 소개 → 이벤트·굿즈 → 참여 방법 → 인증 → Q&A → CTA 순서로 구성했습니다. 캠페인의 취지에 공감한 사용자가 받을 수 있는 업사이클링 굿즈를 확인하고, 참여 방법과 인증 절차를 차례로 이해한 뒤, 남은 궁금증은 Q&A에서 해결하고 마지막 CTA에서 바로 참여할 수 있도록 사용자의 행동 흐름에 맞춰 섹션의 순서를 정했습니다." },
-      { label: "DESIGN", text: "삼다수의 청량한 블루 컬러와 제주 자연의 깨끗한 이미지를 중심으로 브랜드가 가진 맑은 인상을 유지했습니다. 참여 방법처럼 단계가 많은 정보는 긴 설명 대신 단계별 콘텐츠와 아이콘으로 나눠 한눈에 이해할 수 있게 했고, 정보가 많은 캠페인 페이지에서도 각 섹션의 핵심이 먼저 보이도록 우선순위를 정리했습니다. 모바일에서도 같은 흐름으로 참여할 수 있도록 반응형으로 작업했습니다." },
-      { label: "MY ROLE", text: "기획 · 웹 디자인 · 콘텐츠 구성\nTEAM PROJECT · CONTRIBUTION 33%" },
+      { label: "PROJECT STORY", text: "제주삼다수의 친환경 PET 자원순환 캠페인 참여를 유도하기 위해 기획한 참여형 랜딩페이지입니다. 친환경 메시지를 단순히 전달하는 데 그치지 않고, 사용자의 관심이 실제 캠페인 참여로 이어질 수 있도록 전체적인 콘텐츠 구성과 사용자 흐름을 설계했습니다." },
+      { label: "MY CONTRIBUTION", text: "전체 콘텐츠 구성 · 서브페이지 2 기획·디자인·코딩 · 푸터" },
+      { label: "TOOLS", text: "Figma · Photoshop · HTML · CSS" },
+      { label: "RESPONSIVE", text: "데스크톱과 모바일 환경을 고려한 반응형 웹으로 구현했습니다." },
     ],
     team: true,
     featured: true,
     image: "/projects/samdasoo-subpage02.png",
     fullImage: "/projects/samdasoo-subpage02.png",
     thumbTop: true,
+    view: "page",
     alt: "버려짐의 끝에서 새로운 시작이 탄생합니다 - 제주 삼다수 서브페이지 02",
     siteUrl: "https://rjh3217.github.io/samdasuuu/index.html",
   },
