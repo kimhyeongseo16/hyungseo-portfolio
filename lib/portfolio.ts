@@ -106,6 +106,14 @@ export type Category = {
   works: Work[]
   // 대표 프로젝트(featured)를 따로 진열할 때, 진열대 쪽 작업 묶음의 이름
   railLabel?: string
+  // 코너 전체를 한 번만 소개하는 글 — 작품 개수에는 들어가지 않습니다.
+  intro?: CategoryIntro
+}
+
+export type CategoryIntro = {
+  text: string
+  process: string[]
+  tools: string[]
 }
 
 export const CODING_PROJECTS: CodingProject[] = [
@@ -576,7 +584,7 @@ export const CATEGORIES: Category[] = [
   {
     no: "04",
     anchor: "ai",
-    label: "AI 활용",
+    label: "AI CONTENT",
     navLabel: "AI",
     introLabel: "AI",
     sub: "AI 작업 코너",
@@ -585,6 +593,11 @@ export const CATEGORIES: Category[] = [
     flow: "rail",
     background: "/mart/coding-corner.png",
     works: AI_WORKS,
+    intro: {
+      text: "AI를 디자인 작업의 보조 도구로 활용해 브랜드 이미지, 제품 비주얼, 캐릭터 등 다양한 콘텐츠를 제작했습니다. 단순 이미지 생성에 그치지 않고 프로젝트의 콘셉트와 목적에 맞는 결과물을 만들고, Photoshop과 Figma를 활용해 실제 디자인에 적용했습니다.",
+      process: ["콘셉트 설정", "AI 이미지 생성", "결과물 선별 및 수정", "디자인 적용"],
+      tools: ["AI Image Generation", "Photoshop", "Figma"],
+    },
   },
   {
     no: "05",

@@ -3,7 +3,7 @@
 // 형서마트 진열 — 위에서 아래로 한 코너씩 지나가며, 코너 안에서는 작업물이 가로로 흘러갑니다.
 
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from "react"
-import { CATEGORIES, type Category, type Tone, type Work, type ZoneKind } from "@/lib/portfolio"
+import { CATEGORIES, type Category, type CategoryIntro, type Tone, type Work, type ZoneKind } from "@/lib/portfolio"
 import { showTeamTag, TeamTag, WorkLightbox } from "@/components/work-lightbox"
 import { useCart } from "@/components/shopping-cart"
 import { ReceiptPrintStage } from "@/components/checkout-receipt"
@@ -407,6 +407,27 @@ function CornerSign({ category }: { category: Category }) {
   )
 }
 
+// 코너 소개 — 진열대 맨 앞에 한 번만 놓이고, 작품 카드로 세지 않습니다.
+function CornerIntro({ intro }: { intro: CategoryIntro }) {
+  return (
+    <aside className="flex w-[min(78vw,340px)] shrink-0 flex-col justify-center gap-5 self-stretch rounded-[18px] bg-mart-cream-soft/95 px-6 py-6 shadow-[0_16px_28px_-20px_rgba(74,107,134,0.9)] max-sm:w-full">
+      <p className="break-keep font-sans text-[15px] leading-[1.8] text-mart-ink/85">{intro.text}</p>
+      <dl className="space-y-4 border-t border-dashed border-mart-blue/30 pt-5">
+        <div>
+          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">PROCESS</dt>
+          <dd className="mt-1 break-keep font-sans text-[15px] leading-[1.7] text-mart-ink/85">
+            {intro.process.join(" → ")}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-display text-sm tracking-widest text-mart-blue-deep">TOOLS</dt>
+          <dd className="mt-1 font-sans text-[15px] leading-[1.7] text-mart-ink/85">{intro.tools.join(" · ")}</dd>
+        </div>
+      </dl>
+    </aside>
+  )
+}
+
 // 캐릭터는 기울거나 좌우로 흔들리지 않고 제자리에서 위아래로만 통통 뜁니다.
 const HOP = "animate-[hop_1.8s_ease-in-out_infinite]"
 
@@ -511,6 +532,7 @@ function RailCorner({ category, onOpen }: { category: Category; onOpen: (w: Work
             // 오른쪽 안내 영역(--nav-space)은 비워 두고, 진열대는 그 앞에서 잘립니다.
             className="mt-[5vh] mr-[var(--nav-space)] flex gap-7 overflow-x-auto pb-3 pl-[max(5vw,1.25rem)] pr-6 pt-3 [scrollbar-width:none] max-sm:mr-0 max-sm:flex-col max-sm:items-stretch max-sm:overflow-visible max-sm:px-0 [&::-webkit-scrollbar]:hidden"
           >
+            {category.intro && <CornerIntro intro={category.intro} />}
             {renderCards({ category: { ...category, works: railWorks }, shown, onOpen }).map((card, i) => (
               <div key={railWorks[i].id} className="w-[min(78vw,420px)] shrink-0 max-sm:w-full">
                 {card}
