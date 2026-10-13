@@ -213,7 +213,7 @@ function Receipt() {
 export function ReceiptPrintStage({ onDim }: { onDim: (dim: number) => void }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const paperRef = useRef<HTMLDivElement>(null)
-  const [state, setState] = useState({ hold: 0, shift: 0, printerIn: 0, revealed: 0, paperH: 0 })
+  const [state, setState] = useState({ hold: 0, printerTop: 0, printerIn: 0, revealed: 0, paperH: 0 })
 
   useEffect(() => {
     let raf = 0
@@ -233,7 +233,7 @@ export function ReceiptPrintStage({ onDim }: { onDim: (dim: number) => void }) {
       const dim = clamp(s / (vh * 0.5), 0, 1)
       const printerIn = clamp((s - vh * 0.3) / (vh * 0.4), 0, 1)
       const revealed = clamp(s - printStart, 0, paperH)
-      setState({ hold, shift: printerTop + clamp(s, 0, hold) - hold, printerIn, revealed, paperH })
+      setState({ hold, printerTop, printerIn, revealed, paperH })
       onDim(dim)
     }
     const onScroll = () => {
@@ -253,14 +253,18 @@ export function ReceiptPrintStage({ onDim }: { onDim: (dim: number) => void }) {
     }
   }, [onDim])
 
-  const { hold, shift, printerIn, revealed, paperH } = state
+  const { hold, printerTop, printerIn, revealed, paperH } = state
 
   return (
-    <div ref={wrapRef} className="relative w-full overflow-hidden" style={{ paddingBottom: "30vh" }}>
-      <div style={{ height: hold }} />
+    <div
+      ref={wrapRef}
+      className="relative w-full overflow-x-clip"
+      style={{ paddingBottom: `calc(30vh - ${printerTop}px)` }}
+    >
+      <div style={{ height: printerTop }} />
       <div
-        className="relative mx-auto w-[min(100vw,1100px)] max-sm:w-[128vw] max-sm:ml-[-14vw] will-change-transform"
-        style={{ transform: `translateY(${shift + (1 - printerIn) * 28}px)`, opacity: printerIn }}
+        className="sticky mx-auto w-[min(100vw,1100px)] max-sm:w-[128vw] max-sm:ml-[-14vw] will-change-transform"
+        style={{ top: printerTop, transform: `translateY(${(1 - printerIn) * 28}px)`, opacity: printerIn }}
       >
         <img src="/checkout/printer.png" alt="영수증 출력기" className="relative block h-auto w-full" />
         <div
@@ -276,6 +280,7 @@ export function ReceiptPrintStage({ onDim }: { onDim: (dim: number) => void }) {
           </div>
         </div>
       </div>
+      <div style={{ height: hold }} />
     </div>
   )
 }

@@ -197,7 +197,6 @@ export const WEB_PROJECTS: Work[] = [
       { label: "PROJECT STORY", text: "제주삼다수의 친환경 PET 자원순환 캠페인 참여를 유도하기 위해 기획한 참여형 랜딩페이지입니다. 친환경 메시지를 단순히 전달하는 데 그치지 않고, 사용자의 관심이 실제 캠페인 참여로 이어질 수 있도록 전체적인 콘텐츠 구성과 사용자 흐름을 설계했습니다." },
       { label: "MY CONTRIBUTION", text: "팀 리더 · 전체 콘텐츠 구성 · 서브페이지 2 기획·디자인·코딩 · 푸터" },
       { label: "TOOLS", text: "Figma · Photoshop · HTML · CSS" },
-      { label: "RESPONSIVE", text: "데스크톱과 모바일 환경을 고려한 반응형 웹으로 구현했습니다." },
     ],
     team: true,
     featured: true,
