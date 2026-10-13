@@ -757,15 +757,14 @@ function CornerZone({ category }: { category: Category }) {
 
 // 코너와 코너 사이 — 같은 매장 통로를 위에서 아래로 충분히 걸어 내려갑니다.
 function Passage() {
-  // 모바일은 통로 캐릭터를 보여주지 않아 진행도를 계산하지 않습니다.
-  const { ref, p } = useSectionProgress<HTMLElement>("(min-width: 640px)")
+  const { ref, p } = useSectionProgress<HTMLElement>()
   return (
     <section ref={ref} aria-hidden="true" className="relative h-[250vh] w-full bg-mart-cream max-sm:h-[190vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <img src="/mart/vertical-passage.png" alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
         {/* 캐릭터는 크기를 바꾸지 않고 통로를 따라 천천히 아래로 걸어갑니다. */}
         <div
-          className="pointer-events-none absolute left-1/2 top-0 w-[min(30vw,210px)] will-change-transform max-sm:hidden"
+          className="pointer-events-none absolute left-1/2 top-0 w-[min(30vw,210px)] will-change-transform"
           style={{
             transform: `translate(-50%, ${4 + p * 66}vh)`,
             opacity: clamp(p * 14, 0, 1) * clamp((1 - p) * 14, 0, 1),
